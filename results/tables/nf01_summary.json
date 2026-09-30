@@ -3,19 +3,23 @@
   "config_sha256": "330f4bb0da44732ae7e8ce9e8d4f7d19f59c53e396d207036f36d4134d5c740f",
   "rows_read": {
     "unsw": 2365424,
-    "ton": 27520260
+    "ton": 27520260,
+    "cic2018": 20115529
   },
   "rows_published": {
     "unsw": 2365424,
-    "ton": 27520260
+    "ton": 27520260,
+    "cic2018": 20115529
   },
   "rows_after_collapse": {
     "unsw": 1061597,
-    "ton": 4057102
+    "ton": 4057102,
+    "cic2018": 8786293
   },
   "split_hash": {
     "unsw": "a375da2ec9a9f7eb203f9fdb4a67ba1dafb39d2307142fa4b2dfe1fbfe81891f",
-    "ton": "142d07d42ab2ae3ff7dc27c34e4273f4d9840b42960c0f6892a18ac480569f46"
+    "ton": "142d07d42ab2ae3ff7dc27c34e4273f4d9840b42960c0f6892a18ac480569f46",
+    "cic2018": "e30f845708188fb34a3f51ca50a521bb5cfc4e186e7c913f3d54a54ec3242a7d"
   },
   "model_features": 46
 }
