@@ -1,0 +1,7 @@
+dataset,row_idx,fields_changed,dummy_pkts,padding_bytes_removed,timing_changed,observed -> flagged original
+unsw,110645,1,0.0,0.0,1.0,"{""SRC_TO_DST_IAT_MAX"": [2.0, 0.0]}"
+unsw,25826,1,0.0,0.0,1.0,"{""SRC_TO_DST_IAT_MAX"": [6.0, 0.0]}"
+unsw,110382,1,0.0,0.0,1.0,"{""SRC_TO_DST_IAT_MAX"": [236.0, 0.0]}"
+ton,377692,1,0.0,0.0,1.0,"{""SRC_TO_DST_IAT_MIN"": [0.0, 100.0]}"
+ton,377811,1,0.0,0.0,1.0,"{""SRC_TO_DST_IAT_MIN"": [0.0, 100.0]}"
+ton,376471,1,0.0,0.0,1.0,"{""SRC_TO_DST_IAT_MIN"": [0.0, 100.0]}"

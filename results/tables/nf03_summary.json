@@ -1,0 +1,32 @@
+{
+  "operations_config_sha256": "bca227de7310c7b4e479ba03c7f851efdc730ca9fa93c0042335f64c7f10dd2b",
+  "machine": {
+    "cpu": "Intel(R) Xeon(R) CPU @ 2.20GHz",
+    "logical_cpus": 8,
+    "physical_cores": 4
+  },
+  "versions": {
+    "numpy": "2.1.3",
+    "pandas": "2.2.3",
+    "scipy": "1.16.3",
+    "xgboost": "3.4.1"
+  },
+  "time_limit_seconds": 1.0,
+  "seed": 20260930,
+  "detector_models": {
+    "unsw": "8817819d05af02b73bfc6e337edd9407d3aff1f546db4e9a4b5b7429af0ebd02",
+    "ton": "e33192b8d4b6297ce56738bf02077db7a582dda2247a1ae5462307b3e465e093"
+  },
+  "decision": {
+    "unsw": {
+      "certified_share": 0.0,
+      "unresolved_share": 0.0,
+      "passes_rules_1_and_2": false
+    },
+    "ton": {
+      "certified_share": 0.0148,
+      "unresolved_share": 0.8886,
+      "passes_rules_1_and_2": false
+    }
+  }
+}

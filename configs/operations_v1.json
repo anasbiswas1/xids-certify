@@ -1,0 +1,111 @@
+{
+  "assumptions": [
+    "the receiver does not answer dummy packets, so OUT_* counts are unchanged",
+    "padding, dummy packets and delay do not change the protocol, the application protocol or the receiver's fields",
+    "dummy packets may carry any client TCP flags and any advertised window",
+    "fields with no audited formula (per-second bytes, inter-arrival statistics) are free whenever the operations that could affect them are used"
+  ],
+  "attacker": "the sending side of the flow; changes only its own packets",
+  "audited_relations_not_used": {
+    "duration_from_timestamps": "timestamps are not model inputs",
+    "in_bytes_le_pkts_x_longest": "product of two unknowns; leaving it out only widens the preimage",
+    "out_zero_consistency": "OUT_* unchanged",
+    "retrans_out_le_totals": "OUT_* unchanged",
+    "ttl_order": "TTL is not a detector input"
+  },
+  "audited_relations_used": [
+    "duration_in_le_total",
+    "duration_out_le_total",
+    "hist_sum_ge_all_packets",
+    "longest_eq_max_ip_len",
+    "longest_le_1514",
+    "out_bytes_within_pkt_bounds",
+    "retrans_in_le_totals",
+    "shortest_ge_min_ip_len",
+    "tcp_flags_or",
+    "thr_in_bracket_floor_ms",
+    "thr_out_bracket_floor_ms"
+  ],
+  "budgets": {
+    "high": {
+      "delay_ms": 5000,
+      "dummy_pkts": 20,
+      "pad_bytes": 400
+    },
+    "low": {
+      "delay_ms": 100,
+      "dummy_pkts": 1,
+      "pad_bytes": 20
+    },
+    "primary": {
+      "delay_ms": 1000,
+      "dummy_pkts": 5,
+      "pad_bytes": 100
+    }
+  },
+  "dummy_packet_size_bytes": [
+    40,
+    1514
+  ],
+  "feature_roles": {
+    "bracket": [
+      "SRC_TO_DST_AVG_THROUGHPUT",
+      "DST_TO_SRC_AVG_THROUGHPUT"
+    ],
+    "exact": [
+      "IN_PKTS",
+      "IN_BYTES",
+      "RETRANSMITTED_IN_BYTES"
+    ],
+    "free_when_any_operation": [
+      "SRC_TO_DST_SECOND_BYTES",
+      "DST_TO_SRC_SECOND_BYTES"
+    ],
+    "free_when_timing_changes": [
+      "SRC_TO_DST_IAT_MIN",
+      "SRC_TO_DST_IAT_MAX",
+      "SRC_TO_DST_IAT_AVG",
+      "SRC_TO_DST_IAT_STDDEV",
+      "DST_TO_SRC_IAT_MIN",
+      "DST_TO_SRC_IAT_MAX",
+      "DST_TO_SRC_IAT_AVG",
+      "DST_TO_SRC_IAT_STDDEV"
+    ],
+    "range": [
+      "FLOW_DURATION_MILLISECONDS",
+      "DURATION_IN",
+      "DURATION_OUT",
+      "LONGEST_FLOW_PKT",
+      "MAX_IP_PKT_LEN",
+      "SHORTEST_FLOW_PKT",
+      "MIN_IP_PKT_LEN",
+      "CLIENT_TCP_FLAGS",
+      "TCP_FLAGS",
+      "TCP_WIN_MAX_IN",
+      "NUM_PKTS_UP_TO_128_BYTES",
+      "NUM_PKTS_128_TO_256_BYTES",
+      "NUM_PKTS_256_TO_512_BYTES",
+      "NUM_PKTS_512_TO_1024_BYTES",
+      "NUM_PKTS_1024_TO_1514_BYTES"
+    ],
+    "unchanged": [
+      "PROTOCOL",
+      "L7_PROTO",
+      "OUT_BYTES",
+      "OUT_PKTS",
+      "SERVER_TCP_FLAGS",
+      "RETRANSMITTED_IN_PKTS",
+      "RETRANSMITTED_OUT_BYTES",
+      "RETRANSMITTED_OUT_PKTS",
+      "TCP_WIN_MAX_OUT",
+      "ICMP_TYPE",
+      "ICMP_IPV4_TYPE",
+      "DNS_QUERY_TYPE",
+      "DNS_TTL_ANSWER",
+      "FTP_COMMAND_RET_CODE"
+    ]
+  },
+  "fixed_on": "2026-09-30, before any certificate result",
+  "primary_budget": "primary (pass/fail); low and high are sensitivity only",
+  "version": "operations_v1"
+}
