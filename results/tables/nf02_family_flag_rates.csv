@@ -1,7 +1,7 @@
 family,rows,weight,flagged,flag_rate,dataset,weighting
 Analysis,173,173.0,173.0,1.0,unsw,distinct records
 Backdoor,531,531.0,531.0,1.0,unsw,distinct records
-Benign,144903,144903.0,1449.0,0.009999792964948967,unsw,distinct records
+Benign,144903,144903.0,1449.0,0.0099997929649489,unsw,distinct records
 DoS,780,780.0,780.0,1.0,unsw,distinct records
 Exploits,5977,5977.0,5977.0,1.0,unsw,distinct records
 Fuzzers,3925,3925.0,3925.0,1.0,unsw,distinct records
@@ -11,7 +11,7 @@ Shellcode,302,302.0,302.0,1.0,unsw,distinct records
 Worms,21,21.0,21.0,1.0,unsw,distinct records
 Analysis,173,173.0,173.0,1.0,unsw,multiplicity
 Backdoor,531,760.0,760.0,1.0,unsw,multiplicity
-Benign,144903,316107.0,19025.0,0.06018531699709276,unsw,multiplicity
+Benign,144903,316107.0,19025.0,0.0601853169970927,unsw,multiplicity
 DoS,780,813.0,813.0,1.0,unsw,multiplicity
 Exploits,5977,6038.0,6038.0,1.0,unsw,multiplicity
 Fuzzers,3925,5969.0,5969.0,1.0,unsw,multiplicity
@@ -19,23 +19,49 @@ Generic,886,1128.0,1128.0,1.0,unsw,multiplicity
 Reconnaissance,1838,1845.0,1845.0,1.0,unsw,multiplicity
 Shellcode,302,327.0,327.0,1.0,unsw,multiplicity
 Worms,21,21.0,21.0,1.0,unsw,multiplicity
-Backdoor,2992,2992.0,2966.0,0.9913101604278075,ton,distinct records
-Benign,140961,140961.0,1409.0,0.009995672561914288,ton,distinct records
-ddos,67288,67288.0,64693.0,0.9614344311021281,ton,distinct records
+Backdoor,2992,2992.0,2966.0,0.9913101604278076,ton,distinct records
+Benign,140961,140961.0,1409.0,0.0099956725619142,ton,distinct records
+ddos,67288,67288.0,64693.0,0.961434431102128,ton,distinct records
 dos,6398,6398.0,5709.0,0.8923100969052828,ton,distinct records
 injection,50184,50184.0,47490.0,0.9463175514108082,ton,distinct records
 mitm,677,677.0,191.0,0.2821270310192024,ton,distinct records
 password,104007,104007.0,87816.0,0.8443277856298134,ton,distinct records
-ransomware,418,418.0,4.0,0.009569377990430622,ton,distinct records
-scanning,5104,5104.0,3.0,0.0005877742946708464,ton,distinct records
-xss,230906,230906.0,47817.0,0.20708426805713148,ton,distinct records
+ransomware,418,418.0,4.0,0.0095693779904306,ton,distinct records
+scanning,5104,5104.0,3.0,0.0005877742946708,ton,distinct records
+xss,230906,230906.0,47817.0,0.2070842680571314,ton,distinct records
 Backdoor,2992,30328.0,30232.0,0.996834608282775,ton,multiplicity
-Benign,140961,673585.0,1430.0,0.0021229688903404917,ton,multiplicity
-ddos,67288,99900.0,93936.0,0.9403003003003003,ton,multiplicity
-dos,6398,37340.0,35811.0,0.9590519550080343,ton,multiplicity
-injection,50184,214461.0,49967.0,0.23298874853703005,ton,multiplicity
+Benign,140961,673585.0,1430.0,0.0021229688903404,ton,multiplicity
+ddos,67288,99900.0,93936.0,0.9403003003003004,ton,multiplicity
+dos,6398,37340.0,35811.0,0.9590519550080344,ton,multiplicity
+injection,50184,214461.0,49967.0,0.23298874853703,ton,multiplicity
 mitm,677,752.0,198.0,0.2632978723404255,ton,multiplicity
-password,104007,200306.0,180798.0,0.9026090082174273,ton,multiplicity
-ransomware,418,527.0,4.0,0.007590132827324478,ton,multiplicity
-scanning,5104,5595.0,3.0,0.0005361930294906167,ton,multiplicity
-xss,230906,254684.0,66950.0,0.26287477815646054,ton,multiplicity
+password,104007,200306.0,180798.0,0.9026090082174272,ton,multiplicity
+ransomware,418,527.0,4.0,0.0075901328273244,ton,multiplicity
+scanning,5104,5595.0,3.0,0.0005361930294906,ton,multiplicity
+xss,230906,254684.0,66950.0,0.2628747781564605,ton,multiplicity
+Benign,1202968,1202968.0,12014.0,0.009986965571819034,cic2018,distinct records
+Bot,425,425.0,425.0,1.0,cic2018,distinct records
+Brute_Force_-Web,90,90.0,81.0,0.9,cic2018,distinct records
+DDOS_attack-HOIC,36981,36981.0,36981.0,1.0,cic2018,distinct records
+DDOS_attack-LOIC-UDP,250,250.0,250.0,1.0,cic2018,distinct records
+DDoS_attacks-LOIC-HTTP,39859,39859.0,39859.0,1.0,cic2018,distinct records
+DoS_attacks-GoldenEye,3834,3834.0,3832.0,0.9994783515910276,cic2018,distinct records
+DoS_attacks-Hulk,14642,14642.0,14642.0,1.0,cic2018,distinct records
+DoS_attacks-Slowloris,550,550.0,550.0,1.0,cic2018,distinct records
+FTP-BruteForce,1,1.0,1.0,1.0,cic2018,distinct records
+Infilteration,3969,3969.0,1663.0,0.41899722852103805,cic2018,distinct records
+SQL_Injection,13,13.0,12.0,0.9230769230769231,cic2018,distinct records
+SSH-Bruteforce,13503,13503.0,13503.0,1.0,cic2018,distinct records
+Benign,1202968,2018673.0,14062.0,0.00696596229305093,cic2018,multiplicity
+Bot,425,8542.0,8542.0,1.0,cic2018,multiplicity
+Brute_Force_-Web,90,94.0,85.0,0.9042553191489362,cic2018,multiplicity
+DDOS_attack-HOIC,36981,131423.0,131423.0,1.0,cic2018,multiplicity
+DDOS_attack-LOIC-UDP,250,500.0,500.0,1.0,cic2018,multiplicity
+DDoS_attacks-LOIC-HTTP,39859,41688.0,41688.0,1.0,cic2018,multiplicity
+DoS_attacks-GoldenEye,3834,13576.0,7918.0,0.5832351208014143,cic2018,multiplicity
+DoS_attacks-Hulk,14642,14642.0,14642.0,1.0,cic2018,multiplicity
+DoS_attacks-Slowloris,550,1980.0,1980.0,1.0,cic2018,multiplicity
+FTP-BruteForce,1,492330.0,492330.0,1.0,cic2018,multiplicity
+Infilteration,3969,7147.0,3264.0,0.4566951168322373,cic2018,multiplicity
+SQL_Injection,13,17.0,15.0,0.8823529411764706,cic2018,multiplicity
+SSH-Bruteforce,13503,27066.0,27066.0,1.0,cic2018,multiplicity
