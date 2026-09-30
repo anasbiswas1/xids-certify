@@ -1,0 +1,9 @@
+dataset,role,benign,attack,rows,attack_share,target_share,achieved_share
+unsw,detector_train,482795,45940,528735,0.0869,0.5,0.5
+unsw,development,144836,13843,158679,0.0872,0.15,0.1501
+unsw,calibration,144839,13696,158535,0.0864,0.15,0.1499
+unsw,locked_test,193121,18391,211512,0.087,0.2,0.2
+ton,detector_train,468592,1560208,2028800,0.769,0.5,0.5001
+ton,development,142264,465704,607968,0.766,0.15,0.1499
+ton,calibration,141275,466798,608073,0.7677,0.15,0.1499
+ton,locked_test,186711,625184,811895,0.77,0.2,0.2001

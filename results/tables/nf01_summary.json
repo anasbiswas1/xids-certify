@@ -1,0 +1,21 @@
+{
+  "config": "configs/data_nf3_v1.json",
+  "config_sha256": "9def9cfdaf38796d75efa84c31dbdc53fe2f5e7fb6787185cbe8e67becbc0e47",
+  "rows_read": {
+    "unsw": 2365424,
+    "ton": 27520260
+  },
+  "rows_published": {
+    "unsw": 2365424,
+    "ton": 27520260
+  },
+  "rows_after_collapse": {
+    "unsw": 1057461,
+    "ton": 4056736
+  },
+  "split_hash": {
+    "unsw": "a54f15045796dfef599f484fe29130110b88664010fe4855ec9fcd5cda95e00e",
+    "ton": "a7c0cd17f144eb89c3627f51fbd8acddbdafc8116170f2f6c2bc6b91d0532521"
+  },
+  "model_features": 46
+}
