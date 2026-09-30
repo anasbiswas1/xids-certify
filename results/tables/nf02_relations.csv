@@ -19,6 +19,19 @@ unsw,sec_bytes_in_over_bytes,SRC_TO_DST_SECOND_BYTES / IN_BYTES,ratio = 1,530719
 unsw,sec_bytes_in_over_bytes_per_pkt,SRC_TO_DST_SECOND_BYTES / (IN_BYTES/IN_PKTS),ratio = 1,530719,0.0007122413179102312,0.000506,0.155277,31.348277
 unsw,sec_bytes_out_over_rate,DST_TO_SRC_SECOND_BYTES / (OUT_BYTES*1000/FLOW_DURATION),ratio = 1,527988,0.0,1.7e-05,0.000641,0.0279
 unsw,sec_bytes_out_over_bytes_per_pkt,DST_TO_SRC_SECOND_BYTES / (OUT_BYTES/OUT_PKTS),ratio = 1,528119,0.0012383572641772025,0.000691,0.051779,18.520757
+unsw,thr_in_bracket_floor_ms,"SRC_TO_DST_AVG_THROUGHPUT in [BYTES*8000/(FLOW_DURATION+1), BYTES*8000/FLOW_DURATION]",inequality,528612,1.0,,,
+unsw,thr_out_bracket_floor_ms,"DST_TO_SRC_AVG_THROUGHPUT in [BYTES*8000/(FLOW_DURATION+1), BYTES*8000/FLOW_DURATION]",inequality,528612,1.0,,,
+unsw,thr_in_zero_duration_equals_bytes_x8000,SRC_TO_DST_AVG_THROUGHPUT = IN_BYTES*8000 when FLOW_DURATION = 0,equality,2107,1.0,0.0,0.0,0.0
+unsw,hist_sum_ge_all_packets,sum(NUM_PKTS_* bins) >= IN_PKTS + OUT_PKTS,inequality,530719,1.0,,,
+unsw,hist_sum_le_all_packets,sum(NUM_PKTS_* bins) <= IN_PKTS + OUT_PKTS,inequality,530719,0.7466455883433606,,,
+unsw,sec_bytes_in_le_in_bytes,SRC_TO_DST_SECOND_BYTES <= IN_BYTES,inequality,530719,0.9930452838507761,,,
+unsw,sec_bytes_out_le_out_bytes,DST_TO_SRC_SECOND_BYTES <= OUT_BYTES,inequality,530719,0.9984643474230243,,,
+unsw,shortest_le_min_ip_len,SHORTEST_FLOW_PKT <= MIN_IP_PKT_LEN,inequality,530719,0.9951009856440037,,,
+unsw,shortest_ge_min_ip_len,SHORTEST_FLOW_PKT >= MIN_IP_PKT_LEN,inequality,530719,1.0,,,
+unsw,in_bytes_ge_pkts_x_shortest,IN_BYTES >= IN_PKTS*SHORTEST_FLOW_PKT,inequality,530719,0.9823974645716471,,,
+unsw,in_bytes_le_pkts_x_longest,IN_BYTES <= IN_PKTS*LONGEST_FLOW_PKT,inequality,530719,1.0,,,
+unsw,iat_avg_src_to_dst_le_stream_duration_bracket,"SRC_TO_DST_IAT_AVG in [(stream duration - packets)/(packets - 1), (stream duration + 1)/(packets - 1)]",inequality,523517,0.8039490599159148,,,
+unsw,iat_avg_dst_to_src_le_stream_duration_bracket,"DST_TO_SRC_IAT_AVG in [(stream duration - packets)/(packets - 1), (stream duration + 1)/(packets - 1)]",inequality,526690,0.8410715980937553,,,
 unsw,tcp_flags_or,TCP_FLAGS = CLIENT_TCP_FLAGS | SERVER_TCP_FLAGS,equality,530719,1.0,0.0,0.0,0.0
 unsw,ttl_order,MIN_TTL <= MAX_TTL,inequality,530719,1.0,,,
 unsw,iat_order_src_to_dst,SRC_TO_DST_IAT_MIN <= AVG <= MAX,inequality,523517,0.9999064022753797,,,
@@ -53,6 +66,19 @@ ton,sec_bytes_in_over_bytes,SRC_TO_DST_SECOND_BYTES / IN_BYTES,ratio = 1,2028330
 ton,sec_bytes_in_over_bytes_per_pkt,SRC_TO_DST_SECOND_BYTES / (IN_BYTES/IN_PKTS),ratio = 1,2028330,0.0007474128963235766,0.0,0.022518,4.168675
 ton,sec_bytes_out_over_rate,DST_TO_SRC_SECOND_BYTES / (OUT_BYTES*1000/FLOW_DURATION),ratio = 1,1880992,5.316343716507035e-07,0.0,0.000532,0.030821
 ton,sec_bytes_out_over_bytes_per_pkt,DST_TO_SRC_SECOND_BYTES / (OUT_BYTES/OUT_PKTS),ratio = 1,1880992,0.00046890151579592044,0.0,0.009558,1.358189
+ton,thr_in_bracket_floor_ms,"SRC_TO_DST_AVG_THROUGHPUT in [BYTES*8000/(FLOW_DURATION+1), BYTES*8000/FLOW_DURATION]",inequality,2028330,1.0,,,
+ton,thr_out_bracket_floor_ms,"DST_TO_SRC_AVG_THROUGHPUT in [BYTES*8000/(FLOW_DURATION+1), BYTES*8000/FLOW_DURATION]",inequality,2028330,1.0,,,
+ton,thr_in_zero_duration_equals_bytes_x8000,SRC_TO_DST_AVG_THROUGHPUT = IN_BYTES*8000 when FLOW_DURATION = 0,equality,0,,,,
+ton,hist_sum_ge_all_packets,sum(NUM_PKTS_* bins) >= IN_PKTS + OUT_PKTS,inequality,2028330,0.999905833863326,,,
+ton,hist_sum_le_all_packets,sum(NUM_PKTS_* bins) <= IN_PKTS + OUT_PKTS,inequality,2028330,0.9722076782377621,,,
+ton,sec_bytes_in_le_in_bytes,SRC_TO_DST_SECOND_BYTES <= IN_BYTES,inequality,2028330,0.9906721292886266,,,
+ton,sec_bytes_out_le_out_bytes,DST_TO_SRC_SECOND_BYTES <= OUT_BYTES,inequality,2028330,0.9820714578002593,,,
+ton,shortest_le_min_ip_len,SHORTEST_FLOW_PKT <= MIN_IP_PKT_LEN,inequality,2028330,0.927376708918174,,,
+ton,shortest_ge_min_ip_len,SHORTEST_FLOW_PKT >= MIN_IP_PKT_LEN,inequality,2028330,1.0,,,
+ton,in_bytes_ge_pkts_x_shortest,IN_BYTES >= IN_PKTS*SHORTEST_FLOW_PKT,inequality,2028330,0.9759338963580877,,,
+ton,in_bytes_le_pkts_x_longest,IN_BYTES <= IN_PKTS*LONGEST_FLOW_PKT,inequality,2028330,1.0,,,
+ton,iat_avg_src_to_dst_le_stream_duration_bracket,"SRC_TO_DST_IAT_AVG in [(stream duration - packets)/(packets - 1), (stream duration + 1)/(packets - 1)]",inequality,1908892,0.9841033437198123,,,
+ton,iat_avg_dst_to_src_le_stream_duration_bracket,"DST_TO_SRC_IAT_AVG in [(stream duration - packets)/(packets - 1), (stream duration + 1)/(packets - 1)]",inequality,1747686,0.9762011024863734,,,
 ton,tcp_flags_or,TCP_FLAGS = CLIENT_TCP_FLAGS | SERVER_TCP_FLAGS,equality,2028330,1.0,0.0,0.0,0.0
 ton,ttl_order,MIN_TTL <= MAX_TTL,inequality,2028330,1.0,,,
 ton,iat_order_src_to_dst,SRC_TO_DST_IAT_MIN <= AVG <= MAX,inequality,1908892,0.979607018102648,,,

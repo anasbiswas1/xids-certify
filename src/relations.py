@@ -95,6 +95,32 @@ def _audit(df: pd.DataFrame, dataset: str) -> pd.DataFrame:
           g["DST_TO_SRC_SECOND_BYTES"], outb * 1000.0 / dur, pos & (outb > 0))
     ratio("sec_bytes_out_over_bytes_per_pkt", "DST_TO_SRC_SECOND_BYTES / (OUT_BYTES/OUT_PKTS)",
           g["DST_TO_SRC_SECOND_BYTES"], outb / outp, outp > 0)
+    # brackets: a field computed from the exact duration lies between the values implied by the whole-millisecond
+    # duration stored in the file (floor) and that duration plus one millisecond
+    tol = 1e-6
+    for nm, fld, byts, app in (("in", "SRC_TO_DST_AVG_THROUGHPUT", inb, pos),
+                               ("out", "DST_TO_SRC_AVG_THROUGHPUT", outb, pos)):
+        v = g[fld]
+        lo_b, hi_b = byts * 8000.0 / (dur + 1.0), byts * 8000.0 / dur
+        bound(f"thr_{nm}_bracket_floor_ms", f"{fld} in [BYTES*8000/(FLOW_DURATION+1), BYTES*8000/FLOW_DURATION]",
+              (v >= lo_b * (1 - tol) - 1) & (v <= hi_b * (1 + tol) + 1), app)
+    exact("thr_in_zero_duration_equals_bytes_x8000", "SRC_TO_DST_AVG_THROUGHPUT = IN_BYTES*8000 when FLOW_DURATION = 0",
+          g["SRC_TO_DST_AVG_THROUGHPUT"], inb * 8000.0, ~pos)
+    bound("hist_sum_ge_all_packets", "sum(NUM_PKTS_* bins) >= IN_PKTS + OUT_PKTS", hist >= inp + outp)
+    bound("hist_sum_le_all_packets", "sum(NUM_PKTS_* bins) <= IN_PKTS + OUT_PKTS", hist <= inp + outp)
+    bound("sec_bytes_in_le_in_bytes", "SRC_TO_DST_SECOND_BYTES <= IN_BYTES", g["SRC_TO_DST_SECOND_BYTES"] <= inb + ABS_TOL)
+    bound("sec_bytes_out_le_out_bytes", "DST_TO_SRC_SECOND_BYTES <= OUT_BYTES",
+          g["DST_TO_SRC_SECOND_BYTES"] <= outb + ABS_TOL)
+    bound("shortest_le_min_ip_len", "SHORTEST_FLOW_PKT <= MIN_IP_PKT_LEN", lo <= g["MIN_IP_PKT_LEN"] + ABS_TOL)
+    bound("shortest_ge_min_ip_len", "SHORTEST_FLOW_PKT >= MIN_IP_PKT_LEN", lo >= g["MIN_IP_PKT_LEN"] - ABS_TOL)
+    bound("in_bytes_ge_pkts_x_shortest", "IN_BYTES >= IN_PKTS*SHORTEST_FLOW_PKT", inp * lo <= inb + ABS_TOL, inp > 0)
+    bound("in_bytes_le_pkts_x_longest", "IN_BYTES <= IN_PKTS*LONGEST_FLOW_PKT", inb <= inp * hi + ABS_TOL, inp > 0)
+    for d, npk, dd in (("SRC_TO_DST", inp, din), ("DST_TO_SRC", outp, dout)):
+        av = g[f"{d}_IAT_AVG"]
+        bound(f"iat_avg_{d.lower()}_le_stream_duration_bracket",
+              f"{d}_IAT_AVG in [(stream duration - packets)/(packets - 1), (stream duration + 1)/(packets - 1)]",
+              (av >= (dd - npk) / np.maximum(npk - 1, 1) - ABS_TOL) & (av <= (dd + 1) / np.maximum(npk - 1, 1) + ABS_TOL),
+              npk > 1)
     tf, cf, sf = (df[c].to_numpy(dtype=np.int64) for c in ("TCP_FLAGS", "CLIENT_TCP_FLAGS", "SERVER_TCP_FLAGS"))
     exact("tcp_flags_or", "TCP_FLAGS = CLIENT_TCP_FLAGS | SERVER_TCP_FLAGS", tf.astype(float), (cf | sf).astype(float),
           tol=0.0)

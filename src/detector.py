@@ -22,8 +22,21 @@ DETECTOR_CONFIG = {
     "tuning_role": "development (early stopping and threshold only)",
     "threshold_rule": "score threshold giving a 1% false-alarm rate on development benign flows",
     "untouched_roles": ["calibration", "locked_test"],
+    "excluded_host_identity": {
+        "features": ["MIN_TTL", "MAX_TTL"],
+        "reason": "TTL is set by the sending host and reduced by one per router hop; in a testbed it identifies the "
+                  "sending machine, and an attacker sets it with one socket option. Notebook 02 (first run) found "
+                  "MIN_TTL and MAX_TTL each separate NF-UNSW-NB15-v3 classes with AUROC 0.9994 on their own and carry "
+                  "99.4% of that detector's gain. Excluded on both datasets, like IP addresses and ports.",
+    },
 }
 TARGET_FPR = 0.01
+HOST_IDENTITY = ["MIN_TTL", "MAX_TTL"]
+
+
+def detector_features(model_features):
+    """Detector inputs: the data-stage model features minus fields that identify the sending host."""
+    return [f for f in model_features if f not in HOST_IDENTITY]
 
 
 def fit(X_tr, y_tr, X_dev, y_dev, params=None):

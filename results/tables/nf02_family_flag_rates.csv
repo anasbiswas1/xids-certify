@@ -1,7 +1,7 @@
 family,rows,weight,flagged,flag_rate,dataset,weighting
 Analysis,173,173.0,173.0,1.0,unsw,distinct records
 Backdoor,531,531.0,531.0,1.0,unsw,distinct records
-Benign,144903,144903.0,903.0,0.006231755036127617,unsw,distinct records
+Benign,144903,144903.0,1449.0,0.009999792964948967,unsw,distinct records
 DoS,780,780.0,780.0,1.0,unsw,distinct records
 Exploits,5977,5977.0,5977.0,1.0,unsw,distinct records
 Fuzzers,3925,3925.0,3925.0,1.0,unsw,distinct records
@@ -11,7 +11,7 @@ Shellcode,302,302.0,302.0,1.0,unsw,distinct records
 Worms,21,21.0,21.0,1.0,unsw,distinct records
 Analysis,173,173.0,173.0,1.0,unsw,multiplicity
 Backdoor,531,760.0,760.0,1.0,unsw,multiplicity
-Benign,144903,316107.0,14329.0,0.045329587766167787,unsw,multiplicity
+Benign,144903,316107.0,19025.0,0.06018531699709276,unsw,multiplicity
 DoS,780,813.0,813.0,1.0,unsw,multiplicity
 Exploits,5977,6038.0,6038.0,1.0,unsw,multiplicity
 Fuzzers,3925,5969.0,5969.0,1.0,unsw,multiplicity
@@ -19,23 +19,23 @@ Generic,886,1128.0,1128.0,1.0,unsw,multiplicity
 Reconnaissance,1838,1845.0,1845.0,1.0,unsw,multiplicity
 Shellcode,302,327.0,327.0,1.0,unsw,multiplicity
 Worms,21,21.0,21.0,1.0,unsw,multiplicity
-Backdoor,2992,2992.0,2969.0,0.9923128342245989,ton,distinct records
-Benign,140961,140961.0,1408.0,0.00998857840111804,ton,distinct records
-ddos,67288,67288.0,64682.0,0.9612709547021757,ton,distinct records
+Backdoor,2992,2992.0,2966.0,0.9913101604278075,ton,distinct records
+Benign,140961,140961.0,1409.0,0.009995672561914288,ton,distinct records
+ddos,67288,67288.0,64693.0,0.9614344311021281,ton,distinct records
 dos,6398,6398.0,5709.0,0.8923100969052828,ton,distinct records
-injection,50184,50184.0,47391.0,0.9443448110951698,ton,distinct records
-mitm,677,677.0,230.0,0.3397341211225997,ton,distinct records
-password,104007,104007.0,87776.0,0.8439431961310296,ton,distinct records
-ransomware,418,418.0,1.0,0.0023923444976076554,ton,distinct records
-scanning,5104,5104.0,2.0,0.00039184952978056425,ton,distinct records
-xss,230906,230906.0,48585.0,0.21041029683074497,ton,distinct records
-Backdoor,2992,30328.0,30238.0,0.9970324452651016,ton,multiplicity
-Benign,140961,673585.0,1428.0,0.002119999703081274,ton,multiplicity
-ddos,67288,99900.0,93432.0,0.9352552552552552,ton,multiplicity
-dos,6398,37340.0,34650.0,0.9279592929833959,ton,multiplicity
-injection,50184,214461.0,49847.0,0.23242920624262686,ton,multiplicity
-mitm,677,752.0,238.0,0.31648936170212766,ton,multiplicity
-password,104007,200306.0,180294.0,0.9000928579273711,ton,multiplicity
-ransomware,418,527.0,1.0,0.0018975332068311196,ton,multiplicity
-scanning,5104,5595.0,2.0,0.00035746201966041106,ton,multiplicity
-xss,230906,254684.0,67868.0,0.26647924486815033,ton,multiplicity
+injection,50184,50184.0,47490.0,0.9463175514108082,ton,distinct records
+mitm,677,677.0,191.0,0.2821270310192024,ton,distinct records
+password,104007,104007.0,87816.0,0.8443277856298134,ton,distinct records
+ransomware,418,418.0,4.0,0.009569377990430622,ton,distinct records
+scanning,5104,5104.0,3.0,0.0005877742946708464,ton,distinct records
+xss,230906,230906.0,47817.0,0.20708426805713148,ton,distinct records
+Backdoor,2992,30328.0,30232.0,0.996834608282775,ton,multiplicity
+Benign,140961,673585.0,1430.0,0.0021229688903404917,ton,multiplicity
+ddos,67288,99900.0,93936.0,0.9403003003003003,ton,multiplicity
+dos,6398,37340.0,35811.0,0.9590519550080343,ton,multiplicity
+injection,50184,214461.0,49967.0,0.23298874853703005,ton,multiplicity
+mitm,677,752.0,198.0,0.2632978723404255,ton,multiplicity
+password,104007,200306.0,180798.0,0.9026090082174273,ton,multiplicity
+ransomware,418,527.0,4.0,0.007590132827324478,ton,multiplicity
+scanning,5104,5595.0,3.0,0.0005361930294906167,ton,multiplicity
+xss,230906,254684.0,66950.0,0.26287477815646054,ton,multiplicity
