@@ -1,6 +1,6 @@
 {
   "config": "configs/data_nf3_v1.json",
-  "config_sha256": "9def9cfdaf38796d75efa84c31dbdc53fe2f5e7fb6787185cbe8e67becbc0e47",
+  "config_sha256": "330f4bb0da44732ae7e8ce9e8d4f7d19f59c53e396d207036f36d4134d5c740f",
   "rows_read": {
     "unsw": 2365424,
     "ton": 27520260
@@ -10,12 +10,12 @@
     "ton": 27520260
   },
   "rows_after_collapse": {
-    "unsw": 1057461,
-    "ton": 4056736
+    "unsw": 1061597,
+    "ton": 4057102
   },
   "split_hash": {
-    "unsw": "a54f15045796dfef599f484fe29130110b88664010fe4855ec9fcd5cda95e00e",
-    "ton": "a7c0cd17f144eb89c3627f51fbd8acddbdafc8116170f2f6c2bc6b91d0532521"
+    "unsw": "a375da2ec9a9f7eb203f9fdb4a67ba1dafb39d2307142fa4b2dfe1fbfe81891f",
+    "ton": "142d07d42ab2ae3ff7dc27c34e4273f4d9840b42960c0f6892a18ac480569f46"
   },
   "model_features": 46
 }

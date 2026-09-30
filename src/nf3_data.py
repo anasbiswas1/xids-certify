@@ -1,8 +1,9 @@
 """NetFlow v3 data stage for X-IDS-Certify.
 
 Identifies the NF3 archives, checks them against the published schema and row counts, applies the binary label
-policy, collapses exact feature duplicates with label-conflict quarantine, groups flows into conversation-minute
-clusters, assigns clusters to four disjoint roles, and writes one parquet file per dataset outside the repository.
+policy, keeps zero-duration flows with their undefined rates set to 0, collapses exact feature duplicates (majority
+label for groups at least 99% pure, quarantine otherwise), groups flows into conversation-minute clusters, assigns
+clusters to four disjoint roles, and writes one parquet file per dataset outside the repository.
 Two passes over each CSV keep memory bounded for the 27.5M-row ToN-IoT file.
 """
 from __future__ import annotations
@@ -47,6 +48,10 @@ ROLE_SHARES = {"detector_train": 0.50, "development": 0.15, "calibration": 0.15,
 SPLIT_SEED = 20260930
 CLUSTER_WINDOW_MS = 60_000
 CHUNK_ROWS = 1_000_000
+# nProbe leaves the per-second byte rates empty when a flow lasts 0 ms; the rate is undefined, not unknown.
+RATE_FEATURES = ["SRC_TO_DST_SECOND_BYTES", "DST_TO_SRC_SECOND_BYTES"]
+# A duplicate group whose copies disagree on Label keeps its majority label when at least this share agrees.
+PURITY_MIN = 0.99
 
 DATA_CONFIG = {
     "version": "nf3_v1",
@@ -54,9 +59,12 @@ DATA_CONFIG = {
     "model_features": MODEL_FEATURES,
     "excluded_from_model": {"identifiers": IDENTIFIERS, "dns_query_id": "random transaction id"},
     "label_policy": "binary Label column; rows whose Label contradicts the Attack column are quarantined",
-    "missing": "rows with a missing or non-finite model feature are dropped and counted per class",
-    "duplicates": "exact model-feature duplicates collapse to one row with a multiplicity count; groups whose "
-                  "rows disagree on Label are quarantined",
+    "missing": "per-second byte rates of zero-duration flows are set to 0; any other row with a missing or "
+               "non-finite model feature is dropped and counted",
+    "duplicates": "exact model-feature duplicates collapse to one row with a multiplicity count; a group whose "
+                  "rows disagree on Label keeps its majority label when at least 99% of its rows agree and is "
+                  "quarantined otherwise; label purity and minority count are kept per row",
+    "purity_min": 0.99,
     "clusters": "conversation-minute: (source address, destination address, destination port, protocol, "
                 "60 s window of FLOW_START_MILLISECONDS); a cluster never crosses roles",
     "roles": ROLE_SHARES,
@@ -153,10 +161,27 @@ def _label_cols(cols):
     return lab, att
 
 
+def _to_numeric(chunk):
+    return chunk[MODEL_FEATURES].apply(pd.to_numeric, errors="coerce").replace([np.inf, -np.inf], np.nan)
+
+
+def _model_matrix(chunk, X=None):
+    """Model features as float64, with undefined rates of zero-duration flows set to 0 (same in both passes)."""
+    X = _to_numeric(chunk) if X is None else X
+    zero = (X["FLOW_DURATION_MILLISECONDS"] == 0).to_numpy()
+    filled = np.zeros(len(X), dtype=bool)
+    for c in RATE_FEATURES:
+        m = zero & X[c].isna().to_numpy()
+        if m.any():
+            X.loc[m, c] = 0.0
+            filled |= m
+    return X, zero, filled
+
+
 # ------------------------------------------------------------------ pass 1: scan
 def scan(local: Path, member, dataset: str, chunksize=CHUNK_ROWS):
     """One pass: schema check, per-feature statistics, and the small per-row arrays the split needs."""
-    parts = {k: [] for k in ("h", "y", "fam", "key", "ok")}
+    parts = {k: [] for k in ("h", "y", "fam", "key", "ok", "zero", "filled")}
     fam_codes, stats, n = {}, None, 0
     schema_extra = schema_missing = None
     for ci, chunk in enumerate(_chunks(local, member, chunksize)):
@@ -169,7 +194,9 @@ def scan(local: Path, member, dataset: str, chunksize=CHUNK_ROWS):
             if schema_missing:
                 raise ValueError(f"{dataset}: columns missing from the published schema: {schema_missing}")
             stats = {f: {"min": np.inf, "max": -np.inf, "n_missing": 0, "n_zero": 0} for f in MODEL_FEATURES}
-        X = chunk[MODEL_FEATURES].apply(pd.to_numeric, errors="coerce").replace([np.inf, -np.inf], np.nan)
+        X = _to_numeric(chunk)
+        raw_missing = X.isna().sum()
+        X, zero, filled = _model_matrix(chunk, X)
         ok = X.notna().all(axis=1).to_numpy()
         for f in MODEL_FEATURES:
             v = X[f].to_numpy(dtype=np.float64)
@@ -178,7 +205,7 @@ def scan(local: Path, member, dataset: str, chunksize=CHUNK_ROWS):
             if finite.size:
                 s["min"] = min(s["min"], float(finite.min()))
                 s["max"] = max(s["max"], float(finite.max()))
-            s["n_missing"] += int(np.isnan(v).sum())
+            s["n_missing"] += int(raw_missing[f])
             s["n_zero"] += int((finite == 0).sum())
         X32 = X.astype(np.float32)
         parts["h"].append(pd.util.hash_pandas_object(X32, index=False).to_numpy())
@@ -201,6 +228,8 @@ def scan(local: Path, member, dataset: str, chunksize=CHUNK_ROWS):
         parts["y"].append(y)
         parts["fam"].append(codes)
         parts["ok"].append(ok)
+        parts["zero"].append(zero)
+        parts["filled"].append(filled)
         n += len(chunk)
     arrays = {k: np.concatenate(v) for k, v in parts.items()}
     families = {v: k for k, v in fam_codes.items()}
@@ -219,7 +248,9 @@ def decide(arrays, families, dataset: str, seed: int = SPLIT_SEED):
     benign_codes = {c for c, name in families.items() if name.lower() in ("benign", "normal")}
     is_benign_fam = np.isin(fam, list(benign_codes))
     label_conflict = ~np.isin(y, [0, 1]) | ((y == 0) & ~is_benign_fam) | ((y == 1) & is_benign_fam)
-    audit = {"dataset": dataset, "rows_read": int(n), "rows_missing_dropped": int((~ok).sum()),
+    audit = {"dataset": dataset, "rows_read": int(n), "rows_zero_duration": int(arrays["zero"].sum()),
+             "rows_zero_duration_rate_set_0": int(arrays["filled"].sum()),
+             "rows_missing_dropped": int((~ok).sum()),
              "rows_label_attack_conflict": int((label_conflict & ok).sum())}
     alive = ok & ~label_conflict
     idx = np.flatnonzero(alive)
@@ -229,22 +260,44 @@ def decide(arrays, families, dataset: str, seed: int = SPLIT_SEED):
     brk = np.flatnonzero(hs[1:] != hs[:-1]) + 1
     starts = np.r_[0, brk]
     ends = np.r_[brk, len(order)]
-    ys = y[order].astype(np.int16)
+    ys = y[order].astype(np.int64)
     fs = fam[order]
-    run_conflict = np.minimum.reduceat(ys, starts) != np.maximum.reduceat(ys, starts)
-    run_mixed = (np.minimum.reduceat(fs, starts) != np.maximum.reduceat(fs, starts)) & ~run_conflict
     mult = (ends - starts).astype(np.int64)
-    keep = order[starts[~run_conflict]]
-    keep_mult = mult[~run_conflict]
-    audit.update({"duplicate_groups_label_conflict": int(run_conflict.sum()),
-                  "rows_quarantined_duplicate_conflict": int(mult[run_conflict].sum()),
-                  "duplicate_groups_mixed_family_same_label": int(run_mixed.sum()),
-                  "rows_after_collapse": int(len(keep)),
-                  "duplicate_groups_multiplicity_gt1": int((keep_mult > 1).sum()),
-                  "max_multiplicity": int(keep_mult.max()) if len(keep_mult) else 0})
+    n_attack = np.add.reduceat(ys, starts)
+    maj = (2 * n_attack > mult).astype(np.int64)          # ties go to benign
+    n_major = np.where(maj == 1, n_attack, mult - n_attack)
+    purity = n_major / mult
+    mixed_label = (n_attack > 0) & (n_attack < mult)
+    keep_run = purity >= PURITY_MIN
+    # representative: the first row of the group (original file order) that carries the majority label
+    pos = np.arange(len(order))
+    cand = np.where(ys == np.repeat(maj, mult), pos, len(order))
+    first_major = np.minimum.reduceat(cand, starts)
+    run_mixed_fam = (np.minimum.reduceat(fs, starts) != np.maximum.reduceat(fs, starts)) & ~mixed_label
+    keep = order[first_major[keep_run]]
+    keep_mult = mult[keep_run]
+    keep_minor = (mult - n_major)[keep_run]
+    keep_purity = purity[keep_run]
+    bins = [(0.5, 0.9), (0.9, 0.99), (0.99, 0.999), (0.999, 1.0)]
+    audit.update({
+        "duplicate_groups_label_mixed": int(mixed_label.sum()),
+        "rows_in_label_mixed_groups": int(mult[mixed_label].sum()),
+        "label_mixed_groups_kept_majority": int((mixed_label & keep_run).sum()),
+        "minority_rows_absorbed": int((mult - n_major)[mixed_label & keep_run].sum()),
+        "label_mixed_groups_quarantined": int((~keep_run).sum()),
+        "rows_quarantined_duplicate_conflict": int(mult[~keep_run].sum()),
+        "duplicate_groups_mixed_family_same_label": int(run_mixed_fam.sum()),
+        "rows_after_collapse": int(len(keep)),
+        "duplicate_groups_multiplicity_gt1": int((keep_mult > 1).sum()),
+        "max_multiplicity": int(keep_mult.max()) if len(keep_mult) else 0,
+    })
+    for lo, hi in bins:
+        sel = mixed_label & (purity >= lo) & (purity < hi)
+        audit[f"mixed_groups_purity_{lo}_{hi}"] = int(sel.sum())
+        audit[f"mixed_rows_purity_{lo}_{hi}"] = int(mult[sel].sum())
 
     srt = np.argsort(keep)
-    keep, keep_mult = keep[srt], keep_mult[srt]
+    keep, keep_mult, keep_minor, keep_purity = keep[srt], keep_mult[srt], keep_minor[srt], keep_purity[srt]
     cid, uniq = pd.factorize(key[keep], sort=True)
     cid = cid.astype(np.int64)
     n_cl = len(uniq)
@@ -280,7 +333,7 @@ def decide(arrays, families, dataset: str, seed: int = SPLIT_SEED):
     hsh.update(role.astype(np.int8).tobytes())
     audit["split_hash"] = hsh.hexdigest()
 
-    plan = {"keep": keep, "mult": keep_mult, "cid": cid, "role": role}
+    plan = {"keep": keep, "mult": keep_mult, "minor": keep_minor, "purity": keep_purity, "cid": cid, "role": role}
     fam_name = np.array([families[c] for c in range(len(families))], dtype=object)
     by_role = (pd.DataFrame({"role": pd.Categorical.from_codes(role, ROLES), "y": y[keep]})
                .groupby(["role", "y"], observed=False).size().unstack(fill_value=0)
@@ -302,8 +355,11 @@ def decide(arrays, families, dataset: str, seed: int = SPLIT_SEED):
     by_family.insert(0, "dataset", dataset)
     by_family["total"] = by_family[ROLES].sum(axis=1)
     by_family = by_family.sort_values("total", ascending=False).reset_index(drop=True)
-    lp, lcnt = np.unique(fam.astype(np.int64) * 4 + (y.astype(np.int64) + 1), return_counts=True)
-    labels = pd.DataFrame({"family": fam_name[lp // 4], "y": (lp % 4 - 1).astype(np.int8), "rows_read": lcnt})
+    code4 = fam.astype(np.int64) * 4 + (y.astype(np.int64) + 1)
+    lp, lcnt = np.unique(code4, return_counts=True)
+    zp, zcnt = np.unique(code4[arrays["zero"]], return_counts=True)
+    labels = pd.DataFrame({"family": fam_name[lp // 4], "y": (lp % 4 - 1).astype(np.int8), "rows_read": lcnt,
+                           "zero_duration_rows": pd.Series(zcnt, index=zp).reindex(lp, fill_value=0).to_numpy()})
     labels.insert(0, "dataset", dataset)
     return plan, audit, by_role, by_family, labels
 
@@ -317,6 +373,7 @@ def write_parquet(local: Path, member, plan, families, dataset: str, out_dir: Pa
     if tmp.exists():
         tmp.unlink()
     keep, mult, cid, role = plan["keep"], plan["mult"], plan["cid"], plan["role"]
+    minor, purity = plan["minor"], plan["purity"]
     writer, offset, written = None, 0, 0
     for chunk in _chunks(local, member, chunksize):
         lab, att = _label_cols(list(chunk.columns))
@@ -325,7 +382,7 @@ def write_parquet(local: Path, member, plan, families, dataset: str, out_dir: Pa
         sel = keep[a:b] - lo
         if len(sel):
             c = chunk.iloc[sel]
-            X = c[MODEL_FEATURES].apply(pd.to_numeric, errors="coerce").astype(np.float32).reset_index(drop=True)
+            X = _model_matrix(c)[0].astype(np.float32).reset_index(drop=True)
             meta = pd.DataFrame({
                 "row_idx": keep[a:b].astype(np.int64),
                 "src_ip": c["IPV4_SRC_ADDR"].fillna("").astype(str).to_numpy(),
@@ -337,6 +394,8 @@ def write_parquet(local: Path, member, plan, families, dataset: str, out_dir: Pa
                 "family": c[att].fillna("").astype(str).str.strip().to_numpy(),
                 "y": pd.to_numeric(c[lab], errors="coerce").astype(np.int8).to_numpy(),
                 "multiplicity": mult[a:b].astype(np.int64),
+                "minority_rows": minor[a:b].astype(np.int64),
+                "label_purity": purity[a:b].astype(np.float32),
                 "cluster_id": cid[a:b].astype(np.int64),
                 "role": np.array(ROLES, dtype=object)[role[a:b]],
             })

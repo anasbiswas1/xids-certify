@@ -1,6 +1,6 @@
 {
   "clusters": "conversation-minute: (source address, destination address, destination port, protocol, 60 s window of FLOW_START_MILLISECONDS); a cluster never crosses roles",
-  "duplicates": "exact model-feature duplicates collapse to one row with a multiplicity count; groups whose rows disagree on Label are quarantined",
+  "duplicates": "exact model-feature duplicates collapse to one row with a multiplicity count; a group whose rows disagree on Label keeps its majority label when at least 99% of its rows agree and is quarantined otherwise; label purity and minority count are kept per row",
   "excluded_from_model": {
     "dns_query_id": "random transaction id",
     "identifiers": [
@@ -14,7 +14,7 @@
   },
   "fitted_preprocessing": "none at this stage",
   "label_policy": "binary Label column; rows whose Label contradicts the Attack column are quarantined",
-  "missing": "rows with a missing or non-finite model feature are dropped and counted per class",
+  "missing": "per-second byte rates of zero-duration flows are set to 0; any other row with a missing or non-finite model feature is dropped and counted",
   "model_features": [
     "PROTOCOL",
     "L7_PROTO",
@@ -63,6 +63,7 @@
     "DST_TO_SRC_IAT_AVG",
     "DST_TO_SRC_IAT_STDDEV"
   ],
+  "purity_min": 0.99,
   "reference_population": "distinct flow records after duplicate collapse; multiplicity kept",
   "role_assignment": "clusters shuffled within each attack family (or Benign) and allocated by cumulative row share",
   "roles": {
