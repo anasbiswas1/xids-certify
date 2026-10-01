@@ -39,11 +39,101 @@ def detector_features(model_features):
     return [f for f in model_features if f not in HOST_IDENTITY]
 
 
-def fit(X_tr, y_tr, X_dev, y_dev, params=None):
+VARIANTS_CONFIG = {
+    "version": "detector_v2",
+    "fixed_on": "2026-09-30, after notebook 03 failed its pass rules and before any v2 result",
+    "variants": {
+        "v2a_no_timing": "detector_v1 inputs minus the eight inter-arrival and two per-second byte fields, which have "
+                         "no audited formula (ablation)",
+        "v2b_certifiable": "v2a, with the five size bins replaced by five cumulative counts (packets at least as large "
+                           "as each bin edge) and monotone training: the score may only rise with every field the "
+                           "declared operations can only raise, and only fall with receiver-side throughput "
+                           "(primary; the pass rules apply to it)",
+        "v2c_shaping_monotone": "v2b without the three fields the operations can move either way (smallest packet, "
+                                "minimum IP length, source throughput): every field the operations can change is "
+                                "monotone in the attacker's direction, so undoing an in-budget operation can never "
+                                "raise the score and every benign verdict is certified by construction (the verifier "
+                                "confirms each one; the price is detection accuracy)",
+    },
+    "training": "same parameters, roles, early stopping and threshold rule as detector_v1",
+}
+
+
+def variant_features(model_features, variant):
+    from . import operations as ops
+    base = [f for f in detector_features(model_features) if f not in ops.UNMODELLED]
+    if variant == "v1":
+        return detector_features(model_features)
+    if variant == "v2a_no_timing":
+        return base
+    if variant == "v2b_certifiable":
+        return [f for f in base if f not in ops.HIST] + ops.CUM
+    if variant == "v2c_shaping_monotone":
+        return [f for f in base if f not in ops.HIST and f not in ops.BOTH_WAYS] + ops.CUM
+    raise ValueError(variant)
+
+
+def variant_frame(df, model_features, variant):
+    """The detector input table for one variant (adds the cumulative counts when the variant uses them)."""
+    from . import operations as ops
+    feats = variant_features(model_features, variant)
+    out = df.copy()
+    if any(c in feats for c in ops.CUM):
+        ops.add_cumulative(out)
+    return out[feats].astype(np.float32)
+
+
+def context_features(model_features, variant):
+    """Fields the verifier is given for each flow: the detector's inputs plus any field the operation model needs."""
+    from . import certify as cf
+    feats = variant_features(model_features, variant)
+    return feats + [f for f in cf.REQUIRED if f not in feats]
+
+
+def context_frame(df, model_features, variant):
+    from . import operations as ops
+    cols = context_features(model_features, variant)
+    out = df.copy()
+    if any(c in cols for c in ops.CUM):
+        ops.add_cumulative(out)
+    return out[cols].astype(np.float32)
+
+
+def monotone(features, variant):
+    """XGBoost monotone constraints: +1 for fields the operations can only raise, -1 for the one they can only
+    lower, 0 otherwise. Only v2b and v2c are constrained."""
+    from . import operations as ops
+    if variant not in ("v2b_certifiable", "v2c_shaping_monotone"):
+        return None
+    return tuple(1 if f in ops.INCREASE_ONLY else -1 if f in ops.DECREASE_ONLY else 0 for f in features)
+
+
+def monotone_violations(ens, X32, features, constraints, n_rows=300, seed=0):
+    """Share of (row, feature) probes where the trained ensemble breaks its monotone constraint."""
+    rng = np.random.default_rng(seed)
+    rows = X32[rng.permutation(len(X32))[:n_rows]]
+    bad = total = 0
+    for j, (f, c) in enumerate(zip(features, constraints)):
+        if c == 0:
+            continue
+        grid = np.unique(np.quantile(X32[:, j], np.linspace(0, 1, 12)).astype(np.float32))
+        for r in rows:
+            Z = np.repeat(r[None, :], len(grid), axis=0)
+            Z[:, j] = grid
+            m = ens.margin(Z)
+            d = np.diff(m) * c
+            bad += int((d < -1e-6).sum())
+            total += len(d)
+    return bad / max(total, 1)
+
+
+def fit(X_tr, y_tr, X_dev, y_dev, params=None, monotone_constraints=None):
     """Train with early stopping on development and return the booster trimmed to its best round, so the saved,
     verified and deployed model is the same object that makes every decision."""
     import xgboost as xgb
     p = dict(DETECTOR_CONFIG["params"] if params is None else params)
+    if monotone_constraints is not None:
+        p["monotone_constraints"] = "(" + ",".join(str(int(c)) for c in monotone_constraints) + ")"
     model = xgb.XGBClassifier(objective="binary:logistic", n_jobs=-1, **p)
     model.fit(X_tr, y_tr, eval_set=[(X_dev, y_dev)], verbose=False)
     booster = model.get_booster()

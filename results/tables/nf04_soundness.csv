@@ -1,0 +1,5 @@
+dataset,variant,flagged_attacked,evasions,flows,certified_share,certified,witness_share,witness,unresolved_share,unresolved,out_of_model,over_time,median_seconds,p95_seconds
+unsw,v2b_certifiable,2000,2,2.0,0.0,0.0,1.0,2.0,0.0,0.0,0.0,0.0,0.06548801849976371,0.06700676264972572
+unsw,v2c_shaping_monotone,2000,0,,,,,,,,,,,
+ton,v2b_certifiable,2000,908,908.0,0.0,0.0,0.7125550660792952,647.0,0.28744493392070486,261.0,0.0,1.0,0.12096539899994241,1.3211210804501887
+ton,v2c_shaping_monotone,2000,0,,,,,,,,,,,

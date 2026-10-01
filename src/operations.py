@@ -20,6 +20,17 @@ HIST_MIN_WIDTH = 128          # padding below this moves a packet up at most one
 IAT = [f"{d}_IAT_{s}" for d in ("SRC_TO_DST", "DST_TO_SRC") for s in ("MIN", "MAX", "AVG", "STDDEV")]
 SECOND_BYTES = ["SRC_TO_DST_SECOND_BYTES", "DST_TO_SRC_SECOND_BYTES"]
 THROUGHPUT = ["SRC_TO_DST_AVG_THROUGHPUT", "DST_TO_SRC_AVG_THROUGHPUT"]
+# cumulative size counts: packets at least as large as each bin's lower edge (the first one is every packet)
+CUM = ["CUM_PKTS_ALL", "CUM_PKTS_OVER_128", "CUM_PKTS_OVER_256", "CUM_PKTS_OVER_512", "CUM_PKTS_OVER_1024"]
+UNMODELLED = IAT + SECOND_BYTES
+# preimage value <= observed value under every operation (the attacker can only push these up) ...
+INCREASE_ONLY = ["IN_PKTS", "IN_BYTES", "FLOW_DURATION_MILLISECONDS", "DURATION_IN", "DURATION_OUT",
+                 "LONGEST_FLOW_PKT", "MAX_IP_PKT_LEN", "RETRANSMITTED_IN_BYTES", "TCP_WIN_MAX_IN",
+                 "CLIENT_TCP_FLAGS", "TCP_FLAGS"] + CUM
+# ... or >= observed value (delay can only lower the receiver-side throughput)
+DECREASE_ONLY = ["DST_TO_SRC_AVG_THROUGHPUT"]
+# can move either way: padding raises them, a small dummy packet lowers them; delay lowers, padding raises
+BOTH_WAYS = ["SHORTEST_FLOW_PKT", "MIN_IP_PKT_LEN", "SRC_TO_DST_AVG_THROUGHPUT"]
 UNCHANGED = ["PROTOCOL", "L7_PROTO", "OUT_BYTES", "OUT_PKTS", "SERVER_TCP_FLAGS", "RETRANSMITTED_IN_PKTS",
              "RETRANSMITTED_OUT_BYTES", "RETRANSMITTED_OUT_PKTS", "TCP_WIN_MAX_OUT", "ICMP_TYPE", "ICMP_IPV4_TYPE",
              "DNS_QUERY_TYPE", "DNS_TTL_ANSWER", "FTP_COMMAND_RET_CODE"]
@@ -28,13 +39,18 @@ FEATURE_ROLES = {
     "exact": ["IN_PKTS", "IN_BYTES", "RETRANSMITTED_IN_BYTES"],
     "range": ["FLOW_DURATION_MILLISECONDS", "DURATION_IN", "DURATION_OUT", "LONGEST_FLOW_PKT", "MAX_IP_PKT_LEN",
               "SHORTEST_FLOW_PKT", "MIN_IP_PKT_LEN", "CLIENT_TCP_FLAGS", "TCP_FLAGS", "TCP_WIN_MAX_IN"] + HIST,
+    "cumulative_counts": CUM,
     "bracket": THROUGHPUT,
     "free_when_timing_changes": IAT,
     "free_when_any_operation": SECOND_BYTES,
 }
 OPERATIONS_CONFIG = {
-    "version": "operations_v1",
-    "fixed_on": "2026-09-30, before any certificate result",
+    "version": "operations_v2",
+    "fixed_on": "2026-09-30; v1 before any certificate result, v2 after notebook 03 and before any v2 result",
+    "changes_from_v1": ["cumulative size counts and operation directions added",
+                        "receiver-side throughput of the original is at least the observed value",
+                        "any drop in smallest or longest packet must be paid for with padding bytes",
+                        "simulation carries one exact duration per flow"],
     "attacker": "the sending side of the flow; changes only its own packets",
     "budgets": BUDGETS,
     "primary_budget": "primary (pass/fail); low and high are sensitivity only",
@@ -47,6 +63,7 @@ OPERATIONS_CONFIG = {
         "fields with no audited formula (per-second bytes, inter-arrival statistics) are free whenever the "
         "operations that could affect them are used",
     ],
+    "direction": {"increase_only": INCREASE_ONLY, "decrease_only": DECREASE_ONLY, "both_ways": BOTH_WAYS},
     "audited_relations_used": ["duration_in_le_total", "duration_out_le_total", "hist_sum_ge_all_packets",
                                "longest_eq_max_ip_len", "longest_le_1514", "out_bytes_within_pkt_bounds",
                                "retrans_in_le_totals", "shortest_ge_min_ip_len", "tcp_flags_or",
@@ -56,6 +73,13 @@ OPERATIONS_CONFIG = {
                                    "ttl_order": "TTL is not a detector input", "out_zero_consistency": "OUT_* unchanged",
                                    "retrans_out_le_totals": "OUT_* unchanged"},
 }
+
+
+def add_cumulative(frame):
+    """Cumulative size counts from the five bins; works on a DataFrame or a dict of one flow."""
+    for j, c in enumerate(CUM):
+        frame[c] = sum(frame[h] for h in HIST[j:])
+    return frame
 
 
 def integer_features(X, features, limit=2 ** 24):
@@ -119,9 +143,20 @@ def apply_operations(z: dict, budget: dict, rng, plan=None) -> dict:
         bins[int(np.searchsorted([128, 256, 512, 1024], s, side="left"))] += 1
     for b, v in zip(HIST, bins):
         x[b] = float(v)
+    # nProbe computes throughput from the exact duration and stores whole milliseconds (audited bracket), so the
+    # simulation carries one exact duration: the original's, recovered from its throughput, plus the added delay
+    zd = z["FLOW_DURATION_MILLISECONDS"]
+    if zd > 0 and z["OUT_BYTES"] > 0 and z["DST_TO_SRC_AVG_THROUGHPUT"] > 0:
+        exact = min(max(8000.0 * z["OUT_BYTES"] / z["DST_TO_SRC_AVG_THROUGHPUT"], zd), zd + 0.999)
+    elif zd > 0 and z["IN_BYTES"] > 0 and z["SRC_TO_DST_AVG_THROUGHPUT"] > 0:
+        exact = min(max(8000.0 * z["IN_BYTES"] / z["SRC_TO_DST_AVG_THROUGHPUT"], zd), zd + 0.999)
+    else:
+        exact = zd + (rng.uniform(0, 0.999) if zd > 0 else 0.0)
+    exact_x = exact
     if timing:
         add = rng.uniform(0, delay) if delay > 0 else 0.0
-        x["FLOW_DURATION_MILLISECONDS"] = float(np.floor(z["FLOW_DURATION_MILLISECONDS"] + add))
+        exact_x = exact + add
+        x["FLOW_DURATION_MILLISECONDS"] = float(np.floor(exact_x)) if zd > 0 or add > 0 else 0.0
         for d in ("DURATION_IN", "DURATION_OUT"):
             x[d] = float(min(np.floor(z[d] + rng.uniform(0, add)), x["FLOW_DURATION_MILLISECONDS"]))
         for f in IAT:
@@ -131,7 +166,13 @@ def apply_operations(z: dict, budget: dict, rng, plan=None) -> dict:
             x[f] = float(max(0.0, z[f] * rng.uniform(0, 3)))
     dur = x["FLOW_DURATION_MILLISECONDS"]
     for f, byts in (("SRC_TO_DST_AVG_THROUGHPUT", x["IN_BYTES"]), ("DST_TO_SRC_AVG_THROUGHPUT", z["OUT_BYTES"])):
-        x[f] = float(8000.0 * byts) if dur == 0 else float(rng.uniform(8000.0 * byts / (dur + 1), 8000.0 * byts / dur))
+        if dur == 0:
+            x[f] = float(8000.0 * byts)
+        elif f == "DST_TO_SRC_AVG_THROUGHPUT":
+            # receiver bytes are unchanged and the flow can only get longer, so this can only fall
+            x[f] = z[f] if not timing else float(min(z[f], 8000.0 * byts / max(exact_x, dur)))
+        else:
+            x[f] = float(8000.0 * byts / max(exact_x, dur))
     if k:
         x["CLIENT_TCP_FLAGS"] = float(int(z["CLIENT_TCP_FLAGS"]) | int(rng.choice([0, 8, 16, 24])))
         x["TCP_FLAGS"] = float(int(x["CLIENT_TCP_FLAGS"]) | int(z["SERVER_TCP_FLAGS"]))

@@ -1,0 +1,10 @@
+{
+  "fixed_on": "2026-09-30, after notebook 03 failed its pass rules and before any v2 result",
+  "training": "same parameters, roles, early stopping and threshold rule as detector_v1",
+  "variants": {
+    "v2a_no_timing": "detector_v1 inputs minus the eight inter-arrival and two per-second byte fields, which have no audited formula (ablation)",
+    "v2b_certifiable": "v2a, with the five size bins replaced by five cumulative counts (packets at least as large as each bin edge) and monotone training: the score may only rise with every field the declared operations can only raise, and only fall with receiver-side throughput (primary; the pass rules apply to it)",
+    "v2c_shaping_monotone": "v2b without the three fields the operations can move either way (smallest packet, minimum IP length, source throughput): every field the operations can change is monotone in the attacker's direction, so undoing an in-budget operation can never raise the score and every benign verdict is certified by construction (the verifier confirms each one; the price is detection accuracy)"
+  },
+  "version": "detector_v2"
+}

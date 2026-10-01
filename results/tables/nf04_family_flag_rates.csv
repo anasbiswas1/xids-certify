@@ -1,0 +1,121 @@
+family,rows,weight,flagged,flag_rate,dataset,variant,weighting
+Analysis,173,173.0,173.0,1.0,unsw,v2a_no_timing,distinct records
+Backdoor,531,531.0,531.0,1.0,unsw,v2a_no_timing,distinct records
+Benign,144903,144903.0,1449.0,0.009999792964948967,unsw,v2a_no_timing,distinct records
+DoS,780,780.0,780.0,1.0,unsw,v2a_no_timing,distinct records
+Exploits,5977,5977.0,5977.0,1.0,unsw,v2a_no_timing,distinct records
+Fuzzers,3925,3925.0,3925.0,1.0,unsw,v2a_no_timing,distinct records
+Generic,886,886.0,886.0,1.0,unsw,v2a_no_timing,distinct records
+Reconnaissance,1838,1838.0,1838.0,1.0,unsw,v2a_no_timing,distinct records
+Shellcode,302,302.0,302.0,1.0,unsw,v2a_no_timing,distinct records
+Worms,21,21.0,21.0,1.0,unsw,v2a_no_timing,distinct records
+Analysis,173,173.0,173.0,1.0,unsw,v2a_no_timing,multiplicity
+Backdoor,531,760.0,760.0,1.0,unsw,v2a_no_timing,multiplicity
+Benign,144903,316107.0,18835.0,0.059584254698567256,unsw,v2a_no_timing,multiplicity
+DoS,780,813.0,813.0,1.0,unsw,v2a_no_timing,multiplicity
+Exploits,5977,6038.0,6038.0,1.0,unsw,v2a_no_timing,multiplicity
+Fuzzers,3925,5969.0,5969.0,1.0,unsw,v2a_no_timing,multiplicity
+Generic,886,1128.0,1128.0,1.0,unsw,v2a_no_timing,multiplicity
+Reconnaissance,1838,1845.0,1845.0,1.0,unsw,v2a_no_timing,multiplicity
+Shellcode,302,327.0,327.0,1.0,unsw,v2a_no_timing,multiplicity
+Worms,21,21.0,21.0,1.0,unsw,v2a_no_timing,multiplicity
+Analysis,173,173.0,173.0,1.0,unsw,v2b_certifiable,distinct records
+Backdoor,531,531.0,531.0,1.0,unsw,v2b_certifiable,distinct records
+Benign,144903,144903.0,1424.0,0.00982726375575385,unsw,v2b_certifiable,distinct records
+DoS,780,780.0,780.0,1.0,unsw,v2b_certifiable,distinct records
+Exploits,5977,5977.0,5977.0,1.0,unsw,v2b_certifiable,distinct records
+Fuzzers,3925,3925.0,3925.0,1.0,unsw,v2b_certifiable,distinct records
+Generic,886,886.0,886.0,1.0,unsw,v2b_certifiable,distinct records
+Reconnaissance,1838,1838.0,1838.0,1.0,unsw,v2b_certifiable,distinct records
+Shellcode,302,302.0,302.0,1.0,unsw,v2b_certifiable,distinct records
+Worms,21,21.0,21.0,1.0,unsw,v2b_certifiable,distinct records
+Analysis,173,173.0,173.0,1.0,unsw,v2b_certifiable,multiplicity
+Backdoor,531,760.0,760.0,1.0,unsw,v2b_certifiable,multiplicity
+Benign,144903,316107.0,19545.0,0.061830329603583596,unsw,v2b_certifiable,multiplicity
+DoS,780,813.0,813.0,1.0,unsw,v2b_certifiable,multiplicity
+Exploits,5977,6038.0,6038.0,1.0,unsw,v2b_certifiable,multiplicity
+Fuzzers,3925,5969.0,5969.0,1.0,unsw,v2b_certifiable,multiplicity
+Generic,886,1128.0,1128.0,1.0,unsw,v2b_certifiable,multiplicity
+Reconnaissance,1838,1845.0,1845.0,1.0,unsw,v2b_certifiable,multiplicity
+Shellcode,302,327.0,327.0,1.0,unsw,v2b_certifiable,multiplicity
+Worms,21,21.0,21.0,1.0,unsw,v2b_certifiable,multiplicity
+Analysis,173,173.0,173.0,1.0,unsw,v2c_shaping_monotone,distinct records
+Backdoor,531,531.0,531.0,1.0,unsw,v2c_shaping_monotone,distinct records
+Benign,144903,144903.0,1218.0,0.008405623071986086,unsw,v2c_shaping_monotone,distinct records
+DoS,780,780.0,780.0,1.0,unsw,v2c_shaping_monotone,distinct records
+Exploits,5977,5977.0,5977.0,1.0,unsw,v2c_shaping_monotone,distinct records
+Fuzzers,3925,3925.0,3925.0,1.0,unsw,v2c_shaping_monotone,distinct records
+Generic,886,886.0,886.0,1.0,unsw,v2c_shaping_monotone,distinct records
+Reconnaissance,1838,1838.0,1838.0,1.0,unsw,v2c_shaping_monotone,distinct records
+Shellcode,302,302.0,302.0,1.0,unsw,v2c_shaping_monotone,distinct records
+Worms,21,21.0,21.0,1.0,unsw,v2c_shaping_monotone,distinct records
+Analysis,173,173.0,173.0,1.0,unsw,v2c_shaping_monotone,multiplicity
+Backdoor,531,760.0,760.0,1.0,unsw,v2c_shaping_monotone,multiplicity
+Benign,144903,316107.0,18534.0,0.0586320454782716,unsw,v2c_shaping_monotone,multiplicity
+DoS,780,813.0,813.0,1.0,unsw,v2c_shaping_monotone,multiplicity
+Exploits,5977,6038.0,6038.0,1.0,unsw,v2c_shaping_monotone,multiplicity
+Fuzzers,3925,5969.0,5969.0,1.0,unsw,v2c_shaping_monotone,multiplicity
+Generic,886,1128.0,1128.0,1.0,unsw,v2c_shaping_monotone,multiplicity
+Reconnaissance,1838,1845.0,1845.0,1.0,unsw,v2c_shaping_monotone,multiplicity
+Shellcode,302,327.0,327.0,1.0,unsw,v2c_shaping_monotone,multiplicity
+Worms,21,21.0,21.0,1.0,unsw,v2c_shaping_monotone,multiplicity
+Backdoor,2992,2992.0,2961.0,0.9896390374331551,ton,v2a_no_timing,distinct records
+Benign,140961,140961.0,1409.0,0.009995672561914288,ton,v2a_no_timing,distinct records
+ddos,67288,67288.0,65048.0,0.9667102603733206,ton,v2a_no_timing,distinct records
+dos,6398,6398.0,5753.0,0.8991872460143795,ton,v2a_no_timing,distinct records
+injection,50184,50184.0,47574.0,0.9479913916786227,ton,v2a_no_timing,distinct records
+mitm,677,677.0,214.0,0.31610044313146235,ton,v2a_no_timing,distinct records
+password,104007,104007.0,88309.0,0.8490678512023229,ton,v2a_no_timing,distinct records
+ransomware,418,418.0,2.0,0.004784688995215311,ton,v2a_no_timing,distinct records
+scanning,5104,5104.0,0.0,0.0,ton,v2a_no_timing,distinct records
+xss,230906,230906.0,50599.0,0.2191324608282158,ton,v2a_no_timing,distinct records
+Backdoor,2992,30328.0,30222.0,0.9965048799788974,ton,v2a_no_timing,multiplicity
+Benign,140961,673585.0,1431.0,0.0021244534839701,ton,v2a_no_timing,multiplicity
+ddos,67288,99900.0,94712.0,0.9480680680680681,ton,v2a_no_timing,multiplicity
+dos,6398,37340.0,36389.0,0.9745313336904124,ton,v2a_no_timing,multiplicity
+injection,50184,214461.0,49148.0,0.22916987237772835,ton,v2a_no_timing,multiplicity
+mitm,677,752.0,221.0,0.29388297872340424,ton,v2a_no_timing,multiplicity
+password,104007,200306.0,181424.0,0.9057342266332511,ton,v2a_no_timing,multiplicity
+ransomware,418,527.0,2.0,0.003795066413662239,ton,v2a_no_timing,multiplicity
+scanning,5104,5595.0,0.0,0.0,ton,v2a_no_timing,multiplicity
+xss,230906,254684.0,70163.0,0.2754904116473748,ton,v2a_no_timing,multiplicity
+Backdoor,2992,2992.0,2861.0,0.9562165775401069,ton,v2b_certifiable,distinct records
+Benign,140961,140961.0,1394.0,0.009889260149970559,ton,v2b_certifiable,distinct records
+ddos,67288,67288.0,61074.0,0.9076506955177743,ton,v2b_certifiable,distinct records
+dos,6398,6398.0,4454.0,0.6961550484526414,ton,v2b_certifiable,distinct records
+injection,50184,50184.0,45786.0,0.912362505978001,ton,v2b_certifiable,distinct records
+mitm,677,677.0,206.0,0.30428360413589367,ton,v2b_certifiable,distinct records
+password,104007,104007.0,81156.0,0.7802936340823213,ton,v2b_certifiable,distinct records
+ransomware,418,418.0,0.0,0.0,ton,v2b_certifiable,distinct records
+scanning,5104,5104.0,6.0,0.0011755485893416929,ton,v2b_certifiable,distinct records
+xss,230906,230906.0,46215.0,0.20014637991217205,ton,v2b_certifiable,distinct records
+Backdoor,2992,30328.0,27998.0,0.9231733051965181,ton,v2b_certifiable,multiplicity
+Benign,140961,673585.0,1417.0,0.002103669173155578,ton,v2b_certifiable,multiplicity
+ddos,67288,99900.0,89571.0,0.8966066066066066,ton,v2b_certifiable,multiplicity
+dos,6398,37340.0,28408.0,0.7607927155865024,ton,v2b_certifiable,multiplicity
+injection,50184,214461.0,46865.0,0.2185245802267079,ton,v2b_certifiable,multiplicity
+mitm,677,752.0,214.0,0.2845744680851064,ton,v2b_certifiable,multiplicity
+password,104007,200306.0,104933.0,0.523863488862041,ton,v2b_certifiable,multiplicity
+ransomware,418,527.0,0.0,0.0,ton,v2b_certifiable,multiplicity
+scanning,5104,5595.0,6.0,0.0010723860589812334,ton,v2b_certifiable,multiplicity
+xss,230906,254684.0,64593.0,0.2536201724489956,ton,v2b_certifiable,multiplicity
+Backdoor,2992,2992.0,2904.0,0.9705882352941176,ton,v2c_shaping_monotone,distinct records
+Benign,140961,140961.0,1405.0,0.009967295918729293,ton,v2c_shaping_monotone,distinct records
+ddos,67288,67288.0,60827.0,0.9039799072642968,ton,v2c_shaping_monotone,distinct records
+dos,6398,6398.0,4457.0,0.6966239449828071,ton,v2c_shaping_monotone,distinct records
+injection,50184,50184.0,45208.0,0.9008448908018492,ton,v2c_shaping_monotone,distinct records
+mitm,677,677.0,55.0,0.08124076809453472,ton,v2c_shaping_monotone,distinct records
+password,104007,104007.0,81467.0,0.7832838174353649,ton,v2c_shaping_monotone,distinct records
+ransomware,418,418.0,0.0,0.0,ton,v2c_shaping_monotone,distinct records
+scanning,5104,5104.0,9.0,0.0017633228840125393,ton,v2c_shaping_monotone,distinct records
+xss,230906,230906.0,47721.0,0.20666851446042978,ton,v2c_shaping_monotone,distinct records
+Backdoor,2992,30328.0,29212.0,0.9632023212872592,ton,v2c_shaping_monotone,multiplicity
+Benign,140961,673585.0,1427.0,0.0021185151094516652,ton,v2c_shaping_monotone,multiplicity
+ddos,67288,99900.0,89084.0,0.8917317317317317,ton,v2c_shaping_monotone,multiplicity
+dos,6398,37340.0,28210.0,0.7554900910551687,ton,v2c_shaping_monotone,multiplicity
+injection,50184,214461.0,46365.0,0.21619315400002798,ton,v2c_shaping_monotone,multiplicity
+mitm,677,752.0,63.0,0.08377659574468085,ton,v2c_shaping_monotone,multiplicity
+password,104007,200306.0,103151.0,0.5149671003364852,ton,v2c_shaping_monotone,multiplicity
+ransomware,418,527.0,0.0,0.0,ton,v2c_shaping_monotone,multiplicity
+scanning,5104,5595.0,9.0,0.0016085790884718498,ton,v2c_shaping_monotone,multiplicity
+xss,230906,254684.0,64698.0,0.25403244805327385,ton,v2c_shaping_monotone,multiplicity
